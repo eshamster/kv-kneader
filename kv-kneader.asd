@@ -18,7 +18,8 @@
   :license "MIT"
   :depends-on (:alexandria
                :anaphora
-               :cl-annot)
+               :cl-annot
+               :parse-number)
   :components ((:module "src"
                 :serial t
                 :components
