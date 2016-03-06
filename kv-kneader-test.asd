@@ -14,8 +14,10 @@
   :depends-on (:kv-kneader
                :prove)
   :components ((:module "t"
+                :serial t
                 :components
-                ((:test-file "kv-kneader"))))
+                ((:test-file "kv-pair")
+                 (:test-file "kv-kneader"))))
   :description "Test system for kv-kneader"
 
   :defsystem-depends-on (:prove-asdf)
