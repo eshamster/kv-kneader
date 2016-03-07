@@ -24,6 +24,22 @@
               'simple-error)
     (is-error ($:do-options (value '(:a 1 :not-option 100))
                 (:a (print value)))
-              'simple-error)))
+              'simple-error))
+  (subtest
+      "Test parsers"
+    (subtest
+        "Test parse-a-key-description"
+      (is ($:parse-a-key-description nil)
+          #S($:KEY-DESC :KEY NIL :TYPE-OPTION NIL :READER-NAME NIL)
+          :test #'equalp)
+      (is ($:parse-a-key-description '(test :type :number :reader ab))
+          #S($:KEY-DESC :KEY TEST :TYPE-OPTION :NUMBER :READER-NAME AB)
+          :test #'equalp)
+      (is-error ($:parse-a-key-description '(test :type number))
+                'type-error)
+      (is-error ($:parse-a-key-description '(test :reader 'ab))
+                'type-error)
+      (is-error ($:parse-a-key-description '(test :wrong-opt -1))
+                'simple-error))))
 
 (finalize)
