@@ -16,8 +16,10 @@
   :components ((:module "t"
                 :serial t
                 :components
-                ((:test-file "type-converter")
-                 (:test-file "kv-pair") 
+                ((:file "test-utils")
+                 (:test-file "type-converter")
+                 (:test-file "kv-pair")
+                 (:test-file "kneader")
                  (:test-file "kv-kneader"))))
   :description "Test system for kv-kneader"
 

@@ -3,19 +3,73 @@
   (:use :cl)
   (:import-from :alexandria
                 :once-only
-                :with-gensyms))
+                :with-gensyms)
+  (:import-from :alexandria
+                :with-gensyms)
+  (:import-from :cl-annot.doc
+                :doc))
 (in-package :kv-kneader.kneader)
 
-(defstruct key-desc
-  (type-option nil))
+(annot:enable-annot-syntax)
 
-(defun parse-key-description ()
-  "({key-description}*)
+(defstruct key-desc
+  (key nil)
+  (type-option nil)
+  (reader-name nil))
+
+(defstruct key-lst-desc
+  (key-descs nil)
+  (new-name nil))
+
+(defmacro do-options ((var option-lst) &body body)
+  (with-gensyms (rest rec)
+    `(labels ((,rec (,rest)
+                (when ,rest
+                  (let ((,var (cadr ,rest)))
+                    (case (car ,rest)
+                      ,@body
+                      (t (error "The key \"~A\" is not defined" (car ,rest)))))
+                  (,rec (cddr ,rest)))))
+       (unless (evenp (length ,option-lst))
+         (error "The length of option-lst should be even")) 
+       (,rec ,option-lst))))
+
+(defun parse-a-key-description (key-description)
+  (cond ((atom key-description)
+         (make-key-desc :key key-description))
+        ((listp key-description)
+         (let ((desc (make-key-desc :key (car key-description))))
+           (do-options (value (cdr key-description))
+             (:type (setf (key-desc-type-option desc) value))
+             (:reader (setf (key-desc-reader-name desc) value)))
+           desc))))
+
+#|
+Examples.
+  (id ...)
+  ((id :type fixnum)
+  ((id (:new-name :name)) ...)
+  ((id age) ...)
+  (((id :type fixnum)
+    (age :type fixnum)) ...)
+  ((id (age :type fixnum) (:new-name "NA"))) ...)
+|#
+@doc
+"keys-description::= key-name | 
+                     ({key-description}* [[keys-options]])
 key-description::= key-name | (key-name [[options]])
 options::= type-option |
            varialble-name-option
+keys-options::= {:reader name}
 type-option::= (:type type)
-variable-name-option::= (:name name)")
+variable-name-option::= (:name name)"
+(defun parse-keys-description (keys-description) 
+  (let ((desc (make-key-lst-desc)))
+    (cond ((atom keys-description)
+           (push (make-key-desc :key keys-description)
+                 (key-lst-desc-key-descs desc)))
+          ((listp keys-description)))
+    desc))
 
 
 #|
