@@ -34,9 +34,10 @@
          (error "The length of option-lst should be even")) 
        (,rec ,option-lst))))
 
-(defun is-keyword (var)
-  (and (symbolp var)
-       (string= (package-name (symbol-package var)) "KEYWORD")))
+(defun check-if-keyword (var)
+  (unless (and (symbolp var)
+               (string= (package-name (symbol-package var)) "KEYWORD"))
+    (error 'type-error :expected-type :keyword :datum var)))
 
 (defun parse-a-key-description (key-description)
   (cond ((atom key-description)
@@ -44,8 +45,7 @@
         ((listp key-description)
          (let ((desc (make-key-desc :key (car key-description))))
            (do-options (value (cdr key-description))
-             (:type (unless (is-keyword value)
-                      (error 'type-error :expected-type :keyword :datum value))
+             (:type (check-if-keyword value)
                     (setf (key-desc-type-option desc) value))
              (:reader (check-type value symbol)
                       (setf (key-desc-reader-name desc) value)))
