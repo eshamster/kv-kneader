@@ -40,6 +40,15 @@
       (is-error ($:parse-a-key-description '(test :reader 'ab))
                 'type-error)
       (is-error ($:parse-a-key-description '(test :wrong-opt -1))
-                'simple-error))))
+                'simple-error))
+    (subtest
+        "Test parse-keys-options"
+      (let ((desc ($:make-key-lst-desc)))
+        (is-error ($:parse-keys-options '(:wrong-opt -1) desc)
+                  'simple-error)
+        (is-error ($:parse-keys-options '(:new-name (a b)) desc)
+                  'type-error)
+        (ok ($:parse-keys-options '(:new-name "ABC") desc))
+        (is ($:key-lst-desc-new-name desc) "ABC")))))
 
 (finalize)

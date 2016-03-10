@@ -51,6 +51,13 @@
                       (setf (key-desc-reader-name desc) value)))
            desc))))
 
+(defun parse-keys-options (keys-options key-lst-desc)
+  (do-options (value keys-options)
+    (:new-name (unless (atom value)
+                 (error 'type-error :expected-type :atom :datum value))
+               (setf (key-lst-desc-new-name key-lst-desc) value)))
+  key-lst-desc)
+
 #|
 Examples.
   (id ...)
