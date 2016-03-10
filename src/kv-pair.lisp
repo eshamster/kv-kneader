@@ -9,7 +9,7 @@
 
 @export
 (defgeneric find-value-by-key (key pairs)
-  (:documentation "Find key by string= function. If the key is not found, throw key-not-found-error"))
+  (:documentation "Find key by string-equal function. If the key is not found, throw key-not-found-error"))
 
 @export
 (defgeneric init-pairs (size base-pairs)
@@ -31,12 +31,12 @@
   (make-lists-pair))
 
 (defmethod find-value-by-key (key (pairs lists-pair))
-  (aif (position key (lists-pair-header pairs) :test #'string=)
+  (aif (position key (lists-pair-header pairs) :test #'string-equal)
        (nth it (lists-pair-values pairs))
        (error 'key-not-found-error :key key)))
 
 (defmethod push-pair (key value (pairs lists-pair))
-  (if (find key (lists-pair-header pairs) :test #'string=)
+  (if (find key (lists-pair-header pairs) :test #'string-equal)
       (error 'key-duplication-error :key key)
       (progn (push key (lists-pair-header pairs))
              (push value (lists-pair-values pairs)))))
