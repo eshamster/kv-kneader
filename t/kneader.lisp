@@ -49,6 +49,17 @@
         (is-error ($:parse-keys-options '(:new-name (a b)) desc)
                   'type-error)
         (ok ($:parse-keys-options '(:new-name "ABC") desc))
-        (is ($:key-lst-desc-new-name desc) "ABC")))))
+        (is ($:key-lst-desc-new-name desc) "ABC")))
+    (subtest
+        "Test parse-keys-descriptions (easy test)"
+      (labels ((prove-length (desc expected-length)
+                 (is (length ($:key-lst-desc-key-descs desc))
+                     expected-length)))
+        (prove-length ($:parse-keys-descriptions 'abc) 1)
+        (prove-length ($:parse-keys-descriptions '(abc def)) 2)
+        (prove-length ($:parse-keys-descriptions '(abc (def :type :number))) 2)
+        (let ((desc ($:parse-keys-descriptions '(abc (def :type :number) (:new-name new)))))
+          (prove-length desc 2)
+          (is ($:key-lst-desc-new-name desc) 'new))))))
 
 (finalize)

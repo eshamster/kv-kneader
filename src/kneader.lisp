@@ -34,9 +34,12 @@
          (error "The length of option-lst should be even")) 
        (,rec ,option-lst))))
 
+(defun is-keyword (var)
+  (and (symbolp var)
+       (string= (package-name (symbol-package var)) "KEYWORD")))
+
 (defun check-if-keyword (var)
-  (unless (and (symbolp var)
-               (string= (package-name (symbol-package var)) "KEYWORD"))
+  (unless (is-keyword var)
     (error 'type-error :expected-type :keyword :datum var)))
 
 (defun parse-a-key-description (key-description)
@@ -58,6 +61,10 @@
                (setf (key-lst-desc-new-name key-lst-desc) value)))
   key-lst-desc)
 
+(defun is-keys-options (target)
+  (and (listp target)
+       (is-keyword (car target))))
+
 #|
 Examples.
   (id ...)
@@ -77,13 +84,22 @@ options::= type-option |
 keys-options::= {:reader name}
 type-option::= (:type type)
 variable-name-option::= (:name name)"
-(defun parse-keys-description (keys-description) 
-  (let ((desc (make-key-lst-desc)))
-    (cond ((atom keys-description)
-           (push (make-key-desc :key keys-description)
-                 (key-lst-desc-key-descs desc)))
-          ((listp keys-description)))
-    desc))
+(defun parse-keys-descriptions (keys-description)
+  (labels ((push-key-desc (desc lst-desc)
+             (push desc (key-lst-desc-key-descs lst-desc)))
+           (push-atom-key (sym desc)
+             (push-key-desc (make-key-desc :key sym) desc)))
+    (let ((desc (make-key-lst-desc)))
+      (if (atom keys-description)
+          (push-atom-key keys-description desc) 
+          (dolist (a-key-description keys-description)
+            (if (atom a-key-description)
+                (push-atom-key a-key-description desc)
+                (if (is-keyword (car a-key-description))
+                    (parse-keys-options a-key-description desc)
+                    (push-key-desc (parse-a-key-description a-key-description)
+                                   desc)))))
+      desc)))
 
 
 #|
