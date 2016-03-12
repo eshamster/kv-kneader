@@ -70,6 +70,12 @@
                        ($:parse-keys-descriptions '(ab (cd :reader cde) fg))
                        '((list fg cde ab)))
                       ,x ,y ,z)))
-        (is (test 1 2 3) '(3 2 1) :test #'equal)))))
+        (is (test 1 2 3) '(3 2 1) :test #'equal))
+      (macrolet ((test (x)
+                   `(,($:make-lambda-for-processing-values
+                       ($:parse-keys-descriptions '(ab))
+                       '())
+                      ,x)))
+        (is (test 100) 100)))))
 
 (finalize)

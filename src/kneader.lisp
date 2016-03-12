@@ -109,14 +109,18 @@ variable-name-option::= (:name name)"
 ;; ----- auxiliary functions to make list ----- ;;
 
 (defun make-lambda-for-processing-values (key-lst-desc body-lst)
-  (alet (key-lst-desc-key-descs key-lst-desc)
-    `(lambda ,(mapcar (lambda (desc)
-                        (with-slots (key reader-name) desc
-                          (if reader-name
-                              reader-name
-                              key)))
-                      it)
-       ,@body-lst)))
+  (let ((desc-lst (key-lst-desc-key-descs key-lst-desc)))
+    (labels ((make-arg-name (a-key-desc)
+               (with-slots (key reader-name) a-key-desc
+                 (if reader-name reader-name key))))
+      `(lambda ,(mapcar (lambda (desc)
+                          (make-arg-name desc))
+                        desc-lst)
+         ;; In this if codition, simply return the argument
+         ,@(if (and (null body-lst)
+                    (= (length desc-lst) 1))
+               (list (make-arg-name (car desc-lst)))
+               body-lst)))))
 
 
 #|
