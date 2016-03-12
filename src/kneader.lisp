@@ -2,6 +2,10 @@
 (defpackage kv-kneader.kneader
   (:use :cl
         :anaphora)
+  (:import-from :kv-kneader.kv-pair
+                :find-value-by-key
+                :push-pair
+                :init-pairs)
   (:import-from :alexandria
                 :once-only
                 :with-gensyms)
@@ -122,6 +126,11 @@ variable-name-option::= (:name name)"
                (list (make-arg-name (car desc-lst)))
                body-lst)))))
 
+(defun make-extracting-arg-values (key-lst-desc pairs)
+  (mapcar (lambda (desc)
+            (with-slots (key) desc
+              `(find-value-by-key ,key ,pairs)))
+          (key-lst-desc-key-descs key-lst-desc)))
 
 #|
 (defmacro convert-raw-data-one-line (head-line data-line &body body)
