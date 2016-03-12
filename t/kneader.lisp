@@ -68,7 +68,7 @@
       (macrolet ((test (x y z)
                    `(,($:make-lambda-for-processing-values
                        ($:parse-keys-descriptions '(ab (cd :reader cde) fg))
-                       '((list ab cde fg)))
+                       '((list fg cde ab)))
                       ,x ,y ,z)))
         (is (test 1 2 3) '(3 2 1) :test #'equal)))))
 

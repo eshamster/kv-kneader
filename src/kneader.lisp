@@ -102,6 +102,8 @@ variable-name-option::= (:name name)"
                     (parse-keys-options a-key-description desc)
                     (push-key-desc (parse-a-key-description a-key-description)
                                    desc)))))
+      (slet (key-lst-desc-key-descs desc)
+        (setf it (nreverse it)))
       desc)))
 
 ;; ----- auxiliary functions to make list ----- ;;
