@@ -1,6 +1,7 @@
 (in-package :cl-user)
 (defpackage kv-kneader.kneader
-  (:use :cl)
+  (:use :cl
+        :anaphora)
   (:import-from :alexandria
                 :once-only
                 :with-gensyms)
@@ -11,6 +12,8 @@
 (in-package :kv-kneader.kneader)
 
 (annot:enable-annot-syntax)
+
+;; ----- keys parser ----- ;;
 
 (defstruct key-desc
   (key nil)
@@ -100,6 +103,18 @@ variable-name-option::= (:name name)"
                     (push-key-desc (parse-a-key-description a-key-description)
                                    desc)))))
       desc)))
+
+;; ----- auxiliary functions to make list ----- ;;
+
+(defun make-lambda-for-processing-values (key-lst-desc body-lst)
+  `(lambda ,(awhen (key-lst-desc-key-descs key-lst-desc)
+                   (mapcar (lambda (desc)
+                             (with-slots (key reader-name) desc
+                               (if reader-name
+                                   reader-name
+                                   key)))
+                           it))
+     ,@body-lst))
 
 
 #|

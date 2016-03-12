@@ -60,6 +60,16 @@
         (prove-length ($:parse-keys-descriptions '(abc (def :type :number))) 2)
         (let ((desc ($:parse-keys-descriptions '(abc (def :type :number) (:new-name new)))))
           (prove-length desc 2)
-          (is ($:key-lst-desc-new-name desc) 'new))))))
+          (is ($:key-lst-desc-new-name desc) 'new)))))
+  (subtest
+      "Test auxiliary functions to make list"
+    (subtest
+        "Test make-lambda-for-processing-values"
+      (macrolet ((test (x y z)
+                   `(,($:make-lambda-for-processing-values
+                       ($:parse-keys-descriptions '(ab (cd :reader cde) fg))
+                       '((list ab cde fg)))
+                      ,x ,y ,z)))
+        (is (test 1 2 3) '(3 2 1) :test #'equal)))))
 
 (finalize)
