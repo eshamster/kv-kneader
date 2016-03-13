@@ -114,19 +114,20 @@ variable-name-option::= (:name name)"
 
 ;; ----- auxiliary functions to make list ----- ;;
 
+(defun make-arg-name (a-key-desc)
+  (with-slots (key reader-name) a-key-desc
+    (if reader-name reader-name key)))
+
 (defun make-lambda-for-processing-values (key-lst-desc body-lst)
   (let ((desc-lst (key-lst-desc-key-descs key-lst-desc)))
-    (labels ((make-arg-name (a-key-desc)
-               (with-slots (key reader-name) a-key-desc
-                 (if reader-name reader-name key))))
-      `(lambda ,(mapcar (lambda (desc)
-                          (make-arg-name desc))
-                        desc-lst)
-         ;; In this if codition, simply return the argument
-         ,@(if (and (null body-lst)
-                    (= (length desc-lst) 1))
-               (list (make-arg-name (car desc-lst)))
-               body-lst)))))
+    `(lambda ,(mapcar (lambda (desc)
+                        (make-arg-name desc))
+                      desc-lst)
+       ;; In this if codition, simply return the argument
+       ,@(if (and (null body-lst)
+                  (= (length desc-lst) 1))
+             (list (make-arg-name (car desc-lst)))
+             body-lst))))
 
 (defun make-extracting-arg-values (key-lst-desc pairs)
   (mapcar (lambda (desc)
@@ -137,6 +138,21 @@ variable-name-option::= (:name name)"
                   `(find-value-by-key ,key ,pairs))))
           (key-lst-desc-key-descs key-lst-desc)))
 
+(defun join-name (key-descs)
+  (labels ((rec (result rest)
+             (if rest
+                 (let ((name (make-arg-name (car rest))))
+                   (if (string= result "")
+                       (rec name (cdr rest))
+                       (rec (format nil "~A-~A" result name)
+                            (cdr rest))))
+                 result)))
+    (rec "" key-descs)))
+
+(defun make-new-name (key-lst-desc)
+  (aif (key-lst-desc-new-name key-lst-desc)
+       it
+       (join-name (key-lst-desc-key-descs key-lst-desc))))
 #|
 (defmacro convert-raw-data-one-line (head-line data-line &body body)
   (once-only (head-line data-line)

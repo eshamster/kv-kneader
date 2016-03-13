@@ -86,6 +86,12 @@
             (KV-KNEADER.KV-PAIR:FIND-VALUE-BY-KEY B TEMP)
             (KV-KNEADER.TYPE-CONVERTER:CONVERT-TYPE
              (KV-KNEADER.KV-PAIR:FIND-VALUE-BY-KEY C TEMP) :NUMBER))
-          :test #'equal))))
+          :test #'equal))
+    (subtest
+        "Test make-new-name"
+      (let ((lst-desc '("Abc" (b :reader test) c (:new-name "New"))))
+        (is ($:make-new-name ($:parse-keys-descriptions lst-desc)) "New")
+        (is ($:make-new-name ($:parse-keys-descriptions (butlast lst-desc))) "Abc-TEST-C")
+        (is ($:make-new-name ($:parse-keys-descriptions (list (car lst-desc)))) "Abc")))))
 
 (finalize)
