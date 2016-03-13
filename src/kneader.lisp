@@ -129,14 +129,20 @@ variable-name-option::= (:name name)"
              (list (make-arg-name (car desc-lst)))
              body-lst))))
 
+(defun modify-key (key)
+  (print key)
+  (if (symbolp key) (list 'quote key) key))
+
 (defun make-extracting-arg-values (key-lst-desc pairs)
-  (mapcar (lambda (desc)
-            (with-slots (key type-option) desc
-              (if type-option
-                  `(convert-type (find-value-by-key ,key ,pairs)
-                                 ,type-option)
-                  `(find-value-by-key ,key ,pairs))))
-          (key-lst-desc-key-descs key-lst-desc)))
+  (labels ((make-finder (key pairs)
+             `(find-value-by-key ,(modify-key key) ,pairs)))
+    (mapcar (lambda (desc)
+              (with-slots (key type-option) desc
+                (if type-option
+                    `(convert-type ,(make-finder key pairs)
+                                   ,type-option)
+                    (make-finder key pairs))))
+            (key-lst-desc-key-descs key-lst-desc))))
 
 (defun join-name (key-descs)
   (labels ((rec (result rest)
@@ -150,9 +156,10 @@ variable-name-option::= (:name name)"
     (rec "" key-descs)))
 
 (defun make-new-name (key-lst-desc)
-  (aif (key-lst-desc-new-name key-lst-desc)
-       it
-       (join-name (key-lst-desc-key-descs key-lst-desc))))
+  (modify-key
+   (aif (key-lst-desc-new-name key-lst-desc)
+        it
+        (join-name (key-lst-desc-key-descs key-lst-desc)))))
 #|
 (defmacro convert-raw-data-one-line (head-line data-line &body body)
   (once-only (head-line data-line)

@@ -80,16 +80,17 @@
     (subtest
         "Test make-extracting-arg-values"
       (is ($:make-extracting-arg-values ($:parse-keys-descriptions
-                                         '(a (b :reader test) (c :type :number)))
+                                         '(a ("b" :reader test) (c :type :number)))
                                         'temp)
-          '((KV-KNEADER.KV-PAIR:FIND-VALUE-BY-KEY A TEMP)
-            (KV-KNEADER.KV-PAIR:FIND-VALUE-BY-KEY B TEMP)
+          '((KV-KNEADER.KV-PAIR:FIND-VALUE-BY-KEY 'a TEMP)
+            (KV-KNEADER.KV-PAIR:FIND-VALUE-BY-KEY "b" TEMP)
             (KV-KNEADER.TYPE-CONVERTER:CONVERT-TYPE
-             (KV-KNEADER.KV-PAIR:FIND-VALUE-BY-KEY C TEMP) :NUMBER))
+             (KV-KNEADER.KV-PAIR:FIND-VALUE-BY-KEY 'c TEMP) :NUMBER))
           :test #'equal))
     (subtest
         "Test make-new-name"
       (let ((lst-desc '("Abc" (b :reader test) c (:new-name "New"))))
+        (is ($:make-new-name ($:parse-keys-descriptions '(a))) '(quote a))
         (is ($:make-new-name ($:parse-keys-descriptions lst-desc)) "New")
         (is ($:make-new-name ($:parse-keys-descriptions (butlast lst-desc))) "Abc-TEST-C")
         (is ($:make-new-name ($:parse-keys-descriptions (list (car lst-desc)))) "Abc")))))
