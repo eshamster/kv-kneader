@@ -130,7 +130,6 @@ variable-name-option::= (:name name)"
              body-lst))))
 
 (defun modify-key (key)
-  (print key)
   (if (symbolp key) (list 'quote key) key))
 
 (defun make-extracting-arg-values (key-lst-desc pairs)
