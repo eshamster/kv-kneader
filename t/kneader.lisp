@@ -79,10 +79,13 @@
         (is (test 100) 100)))
     (subtest
         "Test make-extracting-arg-values"
-      (is ($:make-extracting-arg-values ($:parse-keys-descriptions '(a (b :reader test) c)) 'temp)
+      (is ($:make-extracting-arg-values ($:parse-keys-descriptions
+                                         '(a (b :reader test) (c :type :number)))
+                                        'temp)
           '((KV-KNEADER.KV-PAIR:FIND-VALUE-BY-KEY A TEMP)
             (KV-KNEADER.KV-PAIR:FIND-VALUE-BY-KEY B TEMP)
-            (KV-KNEADER.KV-PAIR:FIND-VALUE-BY-KEY C TEMP))
+            (KV-KNEADER.TYPE-CONVERTER:CONVERT-TYPE
+             (KV-KNEADER.KV-PAIR:FIND-VALUE-BY-KEY C TEMP) :NUMBER))
           :test #'equal))))
 
 (finalize)

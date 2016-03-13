@@ -2,6 +2,8 @@
 (defpackage kv-kneader.kneader
   (:use :cl
         :anaphora)
+  (:import-from :kv-kneader.type-converter
+                :convert-type)
   (:import-from :kv-kneader.kv-pair
                 :find-value-by-key
                 :push-pair
@@ -128,8 +130,11 @@ variable-name-option::= (:name name)"
 
 (defun make-extracting-arg-values (key-lst-desc pairs)
   (mapcar (lambda (desc)
-            (with-slots (key) desc
-              `(find-value-by-key ,key ,pairs)))
+            (with-slots (key type-option) desc
+              (if type-option
+                  `(convert-type (find-value-by-key ,key ,pairs)
+                                 ,type-option)
+                  `(find-value-by-key ,key ,pairs))))
           (key-lst-desc-key-descs key-lst-desc)))
 
 #|
