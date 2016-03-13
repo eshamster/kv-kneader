@@ -14,6 +14,9 @@
                 :make-lists-pair
                 :lists-pair-header
                 :lists-pair-values)
+
+  (:import-from :kv-kneader.kneader
+                :knead)
   
   (:export :kv-kneader-error
            :key-not-found-error
@@ -25,4 +28,6 @@
            :lists-pair
            :make-lists-pair
            :lists-pair-header
-           :lists-pair-values))
+           :lists-pair-values
+
+           :knead))

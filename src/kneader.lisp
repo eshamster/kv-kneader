@@ -159,32 +159,18 @@ variable-name-option::= (:name name)"
    (aif (key-lst-desc-new-name key-lst-desc)
         it
         (join-name (key-lst-desc-key-descs key-lst-desc)))))
-#|
-(defmacro convert-raw-data-one-line (head-line data-line &body body)
-  (once-only (head-line data-line)
-    (with-gensyms (new-header)
-      `(let ((,new-header))
-         (values (list ,@(mapcar
-                          (lambda (process)
-                            (let* ((names (car process))
-                                   (arg-lst (if (listp names)
-                                                (mapcar (lambda (str)
-                                                          (intern (string-upcase str)))
-                                                        names)
-                                                '(it)))
-                                   (find-lst (if (listp names)
-                                                 (car process)
-                                                 (list names))))
-                              `((lambda (,@arg-lst)
-                                  (setf ,new-header
-                                        (add-to-new-header ',names ,new-header))
-                                  ,@(if (cdr process)
-                                        (re-intern-symbols (cdr process) arg-lst)
-                                        arg-lst))
-                                ,@(mapcar
-                                   (lambda (arg) 
-                                     `(find-target-value ,arg ,head-line ,data-line))
-                                   find-lst))))
-                          body))
-                 (reverse ,new-header))))))
-|#
+
+@export
+(defmacro knead (pairs &body body)
+  (with-gensyms (new-pairs)
+    (once-only (pairs)
+      `(let ((,new-pairs (init-pairs ,(length body) ,pairs)))
+         ,@(nreverse
+            (mapcar (lambda (line)
+                      (let ((desc (parse-keys-descriptions (car line))))
+                        `(push-pair ,(make-new-name desc)
+                                    (,(make-lambda-for-processing-values desc (cdr line))
+                                      ,@(make-extracting-arg-values desc pairs))
+                                    ,new-pairs)))
+                    body))
+         ,new-pairs))))

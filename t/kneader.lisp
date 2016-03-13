@@ -5,7 +5,7 @@
         :kv-kneader))
 (in-package :kv-kneader-test.kneader)
 
-(plan 1)
+(plan 2)
 
 (subtest
     "Test some internals"
@@ -94,5 +94,26 @@
         (is ($:make-new-name ($:parse-keys-descriptions lst-desc)) "New")
         (is ($:make-new-name ($:parse-keys-descriptions (butlast lst-desc))) "Abc-TEST-C")
         (is ($:make-new-name ($:parse-keys-descriptions (list (car lst-desc)))) "Abc")))))
+
+(subtest
+    "Test knead"
+  (let ((pairs (make-lists-pair :header '(ab "cd" ef)
+                                :values '(1 "2" 3))))
+    (is (knead pairs
+          (ab)
+          ((ab ef) (+ ab ef))
+          (((ab :reader test-reader) (:new-name "test-reader")) (* 100 test-reader))
+          ((ab (cd :type :number) (:new-name "test-converter")) (+ ab cd)))
+        #S(LISTS-PAIR
+           :HEADER (AB "AB-EF" "test-reader" "test-converter")
+           :VALUES (1 4 100 3))
+        :test #'equalp) 
+    (is-error (knead pairs
+                ((ab not-found) (declare (ignore ab not-found)) 1000))
+              'key-not-found-error)
+    (is-error (knead pairs
+                (ab)
+                (ab))
+              'key-duplication-error)))
 
 (finalize)
