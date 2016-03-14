@@ -16,11 +16,16 @@
   :version "0.1"
   :author "eshamster"
   :license "MIT"
-  :depends-on (:alexandria)
+  :depends-on (:alexandria
+               :anaphora
+               :cl-annot
+               :parse-number)
   :components ((:module "src"
                 :serial t
                 :components
-                ((:file "type-converter")
+                ((:file "errors")
+                 (:file "type-converter")
+                 (:file "kv-pair")
                  (:file "kneader")
                  (:file "kv-kneader"))))
   :description ""
