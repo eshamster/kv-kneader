@@ -40,3 +40,10 @@
       (error 'key-duplication-error :key key)
       (progn (push key (lists-pair-header pairs))
              (push value (lists-pair-values pairs)))))
+
+(defmethod map-pairs (function (pairs lists-pair))
+  (loop
+     for key in (lists-pair-header pairs)
+     for value in (lists-pair-values pairs)
+       do (funcall function key value)))
+

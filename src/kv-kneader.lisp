@@ -9,6 +9,7 @@
                 :find-value-by-key
                 :init-pairs
                 :push-pair
+                :map-pairs
                 
                 :lists-pair
                 :make-lists-pair
@@ -25,6 +26,7 @@
            :find-value-by-key
            :init-pairs
            :push-pair
+           :map-pairs
            :lists-pair
            :make-lists-pair
            :lists-pair-header
