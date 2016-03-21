@@ -18,6 +18,9 @@
 @export
 (defgeneric push-pair (key value pairs)
   (:documentation "Push key & value pair to pairs. If the key is already included in pairs, thorw key-duplication-error"))
+@export
+(defgeneric map-pairs (function pairs)
+  (:documentation "This is similar function to maphash for kv-pair. The 'function' takes 2 arguments; the first is key and the second is value. The order of keys is not guaranteed."))
 
 ;; --- lists-pair --- ;;
 
