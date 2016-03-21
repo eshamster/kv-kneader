@@ -11,8 +11,6 @@
   (:import-from :alexandria
                 :once-only
                 :with-gensyms)
-  (:import-from :alexandria
-                :with-gensyms)
   (:import-from :cl-annot.doc
                 :doc))
 (in-package :kv-kneader.kneader)
