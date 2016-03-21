@@ -8,6 +8,7 @@
   (:import-from :kv-kneader.kv-pair
                 :find-value-by-key
                 :init-pairs
+                :n-add-pair
                 :push-pair
                 :map-pairs
                 
@@ -25,6 +26,7 @@
 
            :find-value-by-key
            :init-pairs
+           :n-add-pair
            :push-pair
            :map-pairs
            :lists-pair
