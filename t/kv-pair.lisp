@@ -9,7 +9,7 @@
 
 (defun prove-pair-methods (type empty-pairs)
   (let ((pairs (init-pairs 2 empty-pairs)))
-    (subtest "check type"
+    (subtest (format nil "check type: ~A" type)
       (ok (typep pairs type)))
     (subtest "Test push-pair"
       (push-pair 'test1 100 pairs)
@@ -38,6 +38,7 @@
     "Test base methods for each type"
   (subtest
       "Test list-pair"
-    (prove-pair-methods 'lists-pair (make-lists-pair))))
+    (prove-pair-methods 'lists-pair (make-lists-pair))
+    (prove-pair-methods 'list nil)))
 
 (finalize)

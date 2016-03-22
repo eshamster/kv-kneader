@@ -57,3 +57,21 @@
      for value in (lists-pair-values pairs)
        do (funcall function key value)))
 
+;; --- alist (list) --- ;;
+
+(defmethod init-pairs ((size integer) (base-pairs list))
+  nil)
+
+(defmethod find-value-by-key (key (pairs list))
+  (aif (cdr (assoc key pairs :test #'string-equal))
+       it
+       (error 'key-not-found-error :key key)))
+
+(defmethod n-add-pair (key value (pairs list))
+  (if (assoc key pairs :test #'string-equal)
+      (error 'key-duplication-error :key key)
+      (push (cons key value) pairs)))
+
+(defmethod map-pairs (function (pairs list))
+  (dolist (pair pairs)
+    (funcall function (car pair) (cdr pair))))
