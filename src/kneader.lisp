@@ -11,8 +11,6 @@
   (:import-from :alexandria
                 :once-only
                 :with-gensyms)
-  (:import-from :alexandria
-                :with-gensyms)
   (:import-from :cl-annot.doc
                 :doc))
 (in-package :kv-kneader.kneader)
@@ -161,10 +159,11 @@ variable-name-option::= (:name name)"
         (join-name (key-lst-desc-key-descs key-lst-desc)))))
 
 @export
-(defmacro knead (pairs &body body)
+(defmacro knead (pairs (&key (base-pairs :default)) &body body)
   (with-gensyms (new-pairs)
     (once-only (pairs)
-      `(let ((,new-pairs (init-pairs ,(length body) ,pairs)))
+      `(let ((,new-pairs (init-pairs ,(length body)
+                                     (if (eq ,base-pairs :default) ,pairs ,base-pairs))))
          ,@(nreverse
             (mapcar (lambda (line)
                       (let ((desc (parse-keys-descriptions (car line))))

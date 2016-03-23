@@ -16,8 +16,17 @@
   (:documentation "Make an empty pairs whose type is same to the base-pairs. The size indicates guaranteed value not limit."))
 
 @export
-(defgeneric push-pair (key value pairs)
-  (:documentation "Push key & value pair to pairs. If the key is already included in pairs, thorw key-duplication-error"))
+(defmacro push-pair (key value pairs)
+  "Push key & value pair to pairs. If the key is already included in pairs, thorw key-duplication-error"
+  `(setf ,pairs (n-add-pair ,key ,value ,pairs)))
+
+@export
+(defgeneric n-add-pair (key value pairs)
+  (:documentation "Return pairs with new key & value. If the key is already included in pairs, thorw key-duplication-error. The argument 'pairs' might be destroyed."))
+
+@export
+(defgeneric map-pairs (function pairs)
+  (:documentation "This is similar function to maphash for kv-pair. The 'function' takes 2 arguments; the first is key and the second is value. The order of keys is not guaranteed."))
 
 ;; --- lists-pair --- ;;
 
@@ -35,8 +44,34 @@
        (nth it (lists-pair-values pairs))
        (error 'key-not-found-error :key key)))
 
-(defmethod push-pair (key value (pairs lists-pair))
+(defmethod n-add-pair (key value (pairs lists-pair))
   (if (find key (lists-pair-header pairs) :test #'string-equal)
       (error 'key-duplication-error :key key)
       (progn (push key (lists-pair-header pairs))
-             (push value (lists-pair-values pairs)))))
+             (push value (lists-pair-values pairs))))
+  pairs)
+
+(defmethod map-pairs (function (pairs lists-pair))
+  (loop
+     for key in (lists-pair-header pairs)
+     for value in (lists-pair-values pairs)
+       do (funcall function key value)))
+
+;; --- alist (list) --- ;;
+
+(defmethod init-pairs ((size integer) (base-pairs list))
+  nil)
+
+(defmethod find-value-by-key (key (pairs list))
+  (aif (cdr (assoc key pairs :test #'string-equal))
+       it
+       (error 'key-not-found-error :key key)))
+
+(defmethod n-add-pair (key value (pairs list))
+  (if (assoc key pairs :test #'string-equal)
+      (error 'key-duplication-error :key key)
+      (push (cons key value) pairs)))
+
+(defmethod map-pairs (function (pairs list))
+  (dolist (pair pairs)
+    (funcall function (car pair) (cdr pair))))
