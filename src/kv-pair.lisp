@@ -2,7 +2,9 @@
 (defpackage kv-kneader.kv-pair
   (:use :cl
         :anaphora
-        :kv-kneader.errors))
+        :kv-kneader.errors)
+  (:import-from :alexandria
+                :make-keyword))
 (in-package :kv-kneader.kv-pair)
 
 (annot:enable-annot-syntax)
@@ -75,3 +77,29 @@
 (defmethod map-pairs (function (pairs list))
   (dolist (pair pairs)
     (funcall function (car pair) (cdr pair))))
+
+
+;; --- hash-table --- ;;
+
+(defmethod init-pairs ((size integer) (base-pairs hash-table))
+  (make-hash-table))
+
+(defmethod find-value-by-key (key (pairs hash-table))
+  (multiple-value-bind (value present-p)
+      (gethash (make-keyword (string-upcase key)) pairs)
+    (if present-p
+        value
+        (error 'key-not-found-error))))
+
+(defmethod n-add-pair (key value (pair hash-table))
+  (let ((mod-key (make-keyword (string-upcase key))))
+    (symbol-macrolet ((get-place (gethash mod-key pair)))
+      (multiple-value-bind (temp present-p) get-place
+        (declare (ignore temp))
+        (if present-p
+            (error 'key-duplication-error)
+            (setf get-place value)))))
+  pair)
+
+(defmethod map-pairs (function (pairs hash-table))
+  (maphash function pairs))
