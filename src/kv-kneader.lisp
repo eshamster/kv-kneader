@@ -1,5 +1,6 @@
 (in-package :cl-user)
 (defpackage kv-kneader
+  (:nicknames :kneader)
   (:import-from :kv-kneader.errors
                 :kv-kneader-error
                 :key-not-found-error
@@ -27,8 +28,9 @@
            :find-value-by-key
            :init-pairs
            :n-add-pair
-           :push-pair
+           :push-pair 
            :map-pairs
+           
            :lists-pair
            :make-lists-pair
            :lists-pair-header

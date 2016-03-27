@@ -38,7 +38,12 @@
     "Test base methods for each type"
   (subtest
       "Test list-pair"
-    (prove-pair-methods 'lists-pair (make-lists-pair))
-    (prove-pair-methods 'list nil)))
+    (prove-pair-methods 'lists-pair (make-lists-pair)))
+  (subtest
+      "Test alist"
+    (prove-pair-methods 'list nil))
+  (subtest
+      "Test hash-table"
+    (prove-pair-methods 'hash-table (make-hash-table))))
 
 (finalize)
