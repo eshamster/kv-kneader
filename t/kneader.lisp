@@ -2,10 +2,11 @@
 (defpackage kv-kneader-test.kneader
   (:use :cl
         :prove
-        :kv-kneader))
+        :kv-kneader
+        :kv-kneader-test.test-kneader))
 (in-package :kv-kneader-test.kneader)
 
-(plan 2)
+(plan 3)
 
 (subtest
     "Test some internals"
@@ -126,5 +127,22 @@
                   (ab)
                   (ab))
                 'key-duplication-error))))
+
+(eval-when (:execute :compile-toplevel :load-toplevel))
+
+(in-package :kv-kneader-test.kneader)
+
+(subtest
+    "Test the processing interned symbols across packages"
+  (is (test-use-kneaded-symbol) '(("A" . 20) ("C" . 40)) :test #'equalp)
+  ;; In naive implementation, 'a' is 'kv-kneader-test.knead::a' (unbound!!)
+  ;; 'c' is the same as 'a'
+  (is (use-kneaded-symbol (* a 2)
+                          (* c 2))
+      '(("A" . 20) ("C" . 40))
+      :test #'equalp))
+
+(in-package :kv-kneader-test.kneader)
+
 
 (finalize)

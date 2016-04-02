@@ -17,6 +17,7 @@
                 :serial t
                 :components
                 ((:file "test-utils")
+                 (:file "test-kneader")
                  (:test-file "type-converter")
                  (:test-file "kv-pair")
                  (:test-file "kneader")
