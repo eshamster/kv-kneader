@@ -28,7 +28,7 @@
                  (:file "kv-pair")
                  (:file "kneader")
                  (:file "kv-kneader"))))
-  :description ""
+  :description "Kv-Kneader generates new key-value pairs by editting other key-value pairs."
   :long-description
   #.(with-open-file (stream (merge-pathnames
                              #p"README.markdown"

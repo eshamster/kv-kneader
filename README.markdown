@@ -2,7 +2,7 @@
 
 # Kv-Kneader
 
-Kv-Kneader generates new key-value pairs by modifying key-value pairs.
+Kv-Kneader generates new key-value pairs by editting other key-value pairs.
 
 ## Usage
 
@@ -14,8 +14,8 @@ Kv-Kneader generates new key-value pairs by modifying key-value pairs.
 > (defvar base-data '(("a" . 1) (b . "2") (str . "test")))
 BASE-DATA
 > (kneader:knead base-data ()          ;; (the second argument is options)
-    (a (+ a 10))                       ;; search data by key using string-equal and bind
-    (((b :type :number)) (+ b 20))     ;; convert type (now support :number and :string)
+    (a (+ a 10))                       ;; search data by the key using string-equal and bind the value
+    (((b :type :number)) (+ b 20))     ;; convert the type (now support :number and :string)
     ((a (b :type :number)) (+ a b))    ;; can use multiple keys in the same time
     (((str :reader abc) (:new-name new)) (format nil "str: ~A" abc)))
                                        ;; can change the name of reader
@@ -27,7 +27,7 @@ BASE-DATA
 
 Kv-Kneader can use various key-value types. Now, it supports `alist` and `hash-table`. In addition, it provides original structures, `list-pairs`.
 
-Following examples use the next function, `my-knead`.
+Following examples use a sample function, `my-knead`.
 
 ```lisp
 > (defun my-knead (data &key (base-pairs :default))
@@ -74,7 +74,7 @@ key: A, value: 11
 
 ### Type conversion
 
-In default, `kneader:knead` outputs new key-value pairs according to the type of input pairs. It is ppossible to output another type by using `:base-pairs`. This option receives an object instead of a type specifier ((It depends on the implementation of the method `kneader:init-pairs` whether `kneader:knead` re-uses the object)).
+In default, `kneader:knead` outputs new key-value pairs according to the type of input pairs. It is possible to output another type by using the `:base-pairs` option. Note that this option receives an object instead of a type specifier ((It depends on the implementation of the method `kneader:init-pairs` whether `kneader:knead` re-uses the object)).
 
 Example: alist -> list-pairs
 
@@ -135,9 +135,9 @@ key: STR, value: test
 NIL
 ```
 
-## To support other key-value types
+## To support other types of key-value pairs
 
-To support another key-value type, following methods should be implemented for the type. Please see the `src/kv-pair.lisp` for more detail.
+To support another key-value pairs type, following methods should be implemented for the type. Please see the `src/kv-pair.lisp` for more detail.
 
 - `find-value-by-key`
 - `init-pairs`
