@@ -116,16 +116,25 @@ variable-name-option::= (:name name)"
   (with-slots (key reader-name) a-key-desc
     (if reader-name reader-name key)))
 
+
+;; This re-interning is needed for processing interned symbols across packages. See the subtest "Test the processing interned symbols across packages" at t/kneader.lisp for more detail.
+(defun re-intern-bound-symbols (symbol-lst body-lst)
+  (sublis (mapcar (lambda (sym) (cons sym sym)) symbol-lst)
+          body-lst
+          :test (lambda (a b) (and (symbolp a)
+                                   (symbolp b)
+                                   (string= a b)))))
+
 (defun make-lambda-for-processing-values (key-lst-desc body-lst)
-  (let ((desc-lst (key-lst-desc-key-descs key-lst-desc)))
-    `(lambda ,(mapcar (lambda (desc)
-                        (make-arg-name desc))
-                      desc-lst)
+  (let* ((desc-lst (key-lst-desc-key-descs key-lst-desc))
+         (arg-lst (mapcar (lambda (desc) (make-arg-name desc))
+                          desc-lst)))
+    `(lambda ,arg-lst
        ;; In this if codition, simply return the argument
        ,@(if (and (null body-lst)
                   (= (length desc-lst) 1))
-             (list (make-arg-name (car desc-lst)))
-             body-lst))))
+             arg-lst
+             (re-intern-bound-symbols arg-lst body-lst)))))
 
 (defun modify-key (key)
   (if (symbolp key) (list 'quote key) key))
@@ -168,7 +177,8 @@ variable-name-option::= (:name name)"
             (mapcar (lambda (line)
                       (let ((desc (parse-keys-descriptions (car line))))
                         `(push-pair ,(make-new-name desc)
-                                    (,(make-lambda-for-processing-values desc (cdr line))
+                                    (,(make-lambda-for-processing-values desc
+                                                                         (cdr line))
                                       ,@(make-extracting-arg-values desc pairs))
                                     ,new-pairs)))
                     body))
